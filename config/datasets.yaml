@@ -1,0 +1,53 @@
+# All dataset URLs / parsing rules live here, NOT in the Python code.
+# Adding a 5th dataset = adding a block below (no code change needed).
+
+base_url: "https://www.nseindia.com"
+output_dir: "data"
+timezone: "Asia/Kolkata"      # filenames use the NSE (IST) calendar date
+
+network:
+  timeout_seconds: 15
+  max_retries: 3               # 1 initial try + 3 retries
+  initial_backoff_seconds: 1.5
+  backoff_multiplier: 2.0
+  max_backoff_seconds: 20
+  user_agent: "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0 Safari/537.36"
+
+datasets:
+  top-gainers-losers:
+    name: "Top Gainers / Losers"
+    page_url: "https://www.nseindia.com/market-data/top-gainers-losers"
+    requests:                  # two calls, merged into ONE csv with a `category` column
+      - { endpoint: "/api/live-analysis-variations", params: { index: "gainers" }, tag: "gainers" }
+      - { endpoint: "/api/live-analysis-variations", params: { index: "loosers" },  tag: "losers" }
+    tag_column: "category"
+    data_path: ["allSec", "data"]
+    required_columns: ["symbol", "ltp"]
+    dedupe_keys: ["category", "symbol"]
+
+  upper-band-hitters:
+    name: "Upper Band Hitters"
+    page_url: "https://www.nseindia.com/market-data/upper-band-hitters"
+    requests:
+      - { endpoint: "/api/live-analysis-price-band-hitter" }
+    data_path: ["upper", "AllSec", "data"]
+    required_columns: ["symbol"]
+    dedupe_keys: ["symbol"]
+
+  volume-gainers-spurts:
+    name: "Volume Gainers / Spurts"
+    page_url: "https://www.nseindia.com/market-data/volume-gainers-spurts"
+    requests:
+      - { endpoint: "/api/live-analysis-volume-gainers" }
+    data_path: ["data"]
+    required_columns: ["symbol"]
+    dedupe_keys: ["symbol"]
+
+  52-week-high:
+    name: "52 Week High - Equity Market"
+    page_url: "https://www.nseindia.com/market-data/52-week-high-equity-market"
+    requests:
+      - { endpoint: "/api/live-analysis-data-52weekhighstock" }
+    data_path: ["data"]
+    required_columns: ["symbol"]
+    dedupe_keys: ["symbol"]

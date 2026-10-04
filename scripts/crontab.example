@@ -1,0 +1,2 @@
+# NSE closes 15:30 IST. Run at 16:00 IST, Mon-Fri. (Edit paths; server TZ must be IST or adjust the hour.)
+0 16 * * 1-5  cd /path/to/nse-market-data-downloader && /usr/bin/python3 main.py >> logs/cron.out 2>&1
