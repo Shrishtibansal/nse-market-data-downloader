@@ -1,0 +1,29 @@
+﻿name: Daily NSE download
+
+on:
+  schedule:
+    - cron: "30 10 * * 1-5"   # 10:30 UTC = 16:00 IST, Mon-Fri (market closes 15:30 IST)
+  workflow_dispatch:           # lets you also run it by hand from the Actions tab
+
+jobs:
+  download:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+      - run: pip install -r requirements-dev.txt
+      - name: Run tests
+        run: pytest
+      - name: Download datasets
+        run: python main.py
+      - name: Save CSVs and logs
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: nse-data-${{ github.run_id }}
+          path: |
+            data/
+            logs/
