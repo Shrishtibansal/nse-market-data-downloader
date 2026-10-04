@@ -19,8 +19,7 @@ python main.py --output-dir ./my_csvs --log-level DEBUG
 ```
 Exit code: `0` all OK, `1` at least one dataset failed, `2` config/usage error (useful for cron/CI alerts).
 
-**Scheduling:** `scripts/crontab.example` (weekdays 16:00 IST, after market close). Docker: `docker build -t nse . && docker run -v $PWD/data:/data -v $PWD/logs:/app/logs nse`.
-
+**Scheduling:** `.github/workflows/daily-download.yml` runs the tests and then `python main.py` every weekday at 16:00 IST (after market close), and can also be triggered by hand from the GitHub *Actions* tab. Each run uploads that day's CSVs and logs as a downloadable artifact, and GitHub emails the repo owner if a run fails. A cron alternative is in `scripts/crontab.example`. Docker: `docker build -t nse . && docker run -v $PWD/data:/data -v $PWD/logs:/app/logs nse`.
 ## How data acquisition works
 nseindia.com pages are rendered from JSON endpoints, so we call those directly (no HTML scraping, no manual copying).
 NSE rejects "cold" API calls, so the client first loads the home page to get cookies (like a browser), reuses that session,
